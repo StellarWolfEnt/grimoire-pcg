@@ -857,7 +857,7 @@
 
 
 <h1 id="common-types-and-macros">Common Types and Macros</h1>
-<p>This page describes ABI-related macros and shared base types from <code>common.h</code>.</p>
+<p>This page describes ABI-related macros and shared base types from <code>grimoire-pcg/common.h</code>.</p>
 <h2 id="platform-normalization">Platform Normalization</h2>
 <p><code>common.h</code> normalizes <code>_WIN32</code> in some mixed toolchain environments:</p>
 <div class="highlight"><pre><span></span><code><span class="cp">#if !defined(_WIN32) &amp;&amp; (defined(__WIN32__) || defined(WIN32) || defined(__MINGW32__))</span>
@@ -879,6 +879,10 @@
 <p>Fallback:</p>
 <ul>
 <li>If no platform rule applies, <code>GRIMOIRE_API</code> becomes empty.</li>
+</ul>
+<p>Static build note:</p>
+<ul>
+<li>If <code>GRIMOIRE_STATIC</code> is defined, dynamic import/export decoration is skipped.</li>
 </ul>
 <h2 id="grimoire_deprecatedmsg">GRIMOIRE_DEPRECATED(msg)</h2>
 <p>Provides cross-compiler deprecation annotation:</p>
@@ -910,10 +914,10 @@
 </ul>
 <h2 id="consumer-build-checklist">Consumer Build Checklist</h2>
 <ul>
-<li>Ensure include path points to <code>include/</code>.</li>
-<li>Define <code>_GRIMOIRE_BUILD</code> only when building the DLL itself.</li>
-<li>Do not define <code>_GRIMOIRE_BUILD</code> in consuming applications.</li>
-<li>In C++ code, include headers directly without wrapping additional <code>extern "C"</code> blocks.</li>
+<li>Ensure include path points to the folder that contains <code>grimoire-pcg/</code>.</li>
+<li>Define <code>_GRIMOIRE_BUILD</code> only when compiling the DLL itself.</li>
+<li>Do not define <code>_GRIMOIRE_BUILD</code> in consuming apps.</li>
+<li>In C++, include headers directly without adding another <code>extern "C"</code> wrapper.</li>
 </ul>
 
 

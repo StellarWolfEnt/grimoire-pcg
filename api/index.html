@@ -669,10 +669,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#design-notes" class="md-nav__link">
+  <a href="#export-surface" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Design Notes
+        Export Surface
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#determinism-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Determinism Model
       
     </span>
   </a>
@@ -691,10 +702,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#return-value-expectations" class="md-nav__link">
+  <a href="#return-and-ownership-rules" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Return Value Expectations
+        Return and Ownership Rules
       
     </span>
   </a>
@@ -702,10 +713,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#determinism-contract" class="md-nav__link">
+  <a href="#state-persistence" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Determinism Contract
+        State Persistence
       
     </span>
   </a>
@@ -733,18 +744,29 @@
 
 
 <h1 id="api-overview">API Overview</h1>
-<p>Grimoire exposes a C API through three public headers.</p>
+<p>Grimoire exposes a C ABI through three public headers and a matching DLL export table.</p>
 <h2 id="header-map">Header Map</h2>
 <ul>
-<li>common.h: shared macros, ABI export definitions, and base types</li>
-<li>random.h: deterministic pseudo-random generator API</li>
-<li>noise.h: value/perlin noise and fractal helpers</li>
+<li><code>grimoire-pcg/common.h</code>: shared macros, ABI visibility, base seed type</li>
+<li><code>grimoire-pcg/random.h</code>: opaque RNG lifecycle, sampling, and state persistence</li>
+<li><code>grimoire-pcg/noise.h</code>: deterministic value/perlin noise and fractal combiners</li>
 </ul>
-<h2 id="design-notes">Design Notes</h2>
+<h2 id="export-surface">Export Surface</h2>
+<p>Export groups:</p>
 <ul>
-<li>Stable C ABI surface through exported functions</li>
-<li>Opaque random state handle to preserve implementation flexibility</li>
-<li>Seed-driven deterministic behavior for reproducible procedural results</li>
+<li>Random lifecycle and sampling</li>
+<li>Random state save/restore and cloning</li>
+<li>ValueSharp/ValueSmooth noise (1D/2D/3D)</li>
+<li>Perlin noise (1D/2D/3D)</li>
+<li>Fractal combiners (<code>Grimoire_Fbm</code>, <code>Grimoire_Billow</code>)</li>
+</ul>
+<h2 id="determinism-model">Determinism Model</h2>
+<p>Given identical inputs, Grimoire returns identical outputs:</p>
+<ul>
+<li>same function</li>
+<li>same coordinates and seed</li>
+<li>same settings</li>
+<li>same call order</li>
 </ul>
 <h2 id="documentation-map">Documentation Map</h2>
 <ul>
@@ -754,20 +776,20 @@
 <li>Quick Reference: compact signature index</li>
 <li>Recipes: implementation patterns for real projects</li>
 </ul>
-<h2 id="return-value-expectations">Return Value Expectations</h2>
+<h2 id="return-and-ownership-rules">Return and Ownership Rules</h2>
 <ul>
-<li>Most numeric APIs return scalar values directly.</li>
-<li>Handle-creating APIs can return <code>NULL</code> and should always be checked.</li>
-<li>Pointer-based inputs should be validated by consumers before calling.</li>
+<li>Handle-creating APIs can return <code>NULL</code> and must be checked.</li>
+<li>Every successful <code>Create*</code>, <code>Clone</code>, or <code>Deserialize</code> handle must be destroyed.</li>
+<li>Numeric functions return values directly; there is no exception channel.</li>
+<li>Pointer arguments (buffers/settings) must be valid for the full call.</li>
 </ul>
-<h2 id="determinism-contract">Determinism Contract</h2>
-<p>For deterministic workflows, reproducibility requires:</p>
+<h2 id="state-persistence">State Persistence</h2>
 <ul>
-<li>fixed seeds</li>
-<li>consistent call order</li>
-<li>consistent algorithm/function choice</li>
-<li>consistent settings for fractal composition</li>
+<li>RNG state serialization currently requires a 228-byte buffer.</li>
+<li>A serialized blob should only be restored against compatible releases.</li>
+<li>For robust save files, store blob size and your own save-format version.</li>
 </ul>
+<p>See Recipes for full checkpoint examples.</p>
 
 
 

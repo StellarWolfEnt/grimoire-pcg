@@ -741,10 +741,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-save-and-resume-sequence" class="md-nav__link">
+  <a href="#example-checkpoint-and-resume-stream" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Example: Save and Resume Sequence
+        Example: Checkpoint and Resume Stream
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-branching-a-deterministic-stream" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Branching a Deterministic Stream
       
     </span>
   </a>
@@ -1148,10 +1159,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#example-save-and-resume-sequence" class="md-nav__link">
+  <a href="#example-checkpoint-and-resume-stream" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Example: Save and Resume Sequence
+        Example: Checkpoint and Resume Stream
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-branching-a-deterministic-stream" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Branching a Deterministic Stream
       
     </span>
   </a>
@@ -1190,7 +1212,7 @@
 </ul>
 <h2 id="lifecycle-functions">Lifecycle Functions</h2>
 <h3 id="grimoirerandom_createnew">GrimoireRandom_CreateNew</h3>
-<div class="highlight"><pre><span></span><code><span class="n">GRIMOIRE_API</span><span class="w"> </span><span class="n">GrimoireRandom</span><span class="w"> </span><span class="n">GrimoireRandom_CreateNew</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<div class="highlight"><pre><span></span><code><span class="n">GRIMOIRE_API</span><span class="w"> </span><span class="n">GrimoireRandom</span><span class="w"> </span><span class="n">GrimoireRandom_CreateNew</span><span class="p">();</span>
 </code></pre></div>
 <p>Creates a new instance with a non-deterministic seed source.</p>
 <ul>
@@ -1217,20 +1239,22 @@
 <div class="highlight"><pre><span></span><code><span class="n">GRIMOIRE_API</span><span class="w"> </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">GrimoireRandom_Next</span><span class="p">(</span><span class="n">GrimoireRandom</span><span class="w"> </span><span class="n">random</span><span class="p">);</span>
 </code></pre></div>
 <p>Returns a pseudo-random signed 32-bit integer.</p>
+<ul>
+<li>Interval: <code>[0, INT32_MAX)</code></li>
+</ul>
 <h3 id="grimoirerandom_nextrange">GrimoireRandom_NextRange</h3>
 <div class="highlight"><pre><span></span><code><span class="n">GRIMOIRE_API</span><span class="w"> </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">GrimoireRandom_NextRange</span><span class="p">(</span><span class="n">GrimoireRandom</span><span class="w"> </span><span class="n">random</span><span class="p">,</span><span class="w"> </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">min</span><span class="p">,</span><span class="w"> </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">max</span><span class="p">);</span>
 </code></pre></div>
-<p>Returns a pseudo-random integer in <code>[min, max]</code>.</p>
+<p>Returns a pseudo-random integer in <code>[min, max)</code>.</p>
 <ul>
-<li>Precondition: <code>min &lt;= max</code>.</li>
-<li>Undefined behavior if <code>min &gt; max</code>.</li>
+<li>Precondition: <code>min &lt; max</code>.</li>
 </ul>
 <h3 id="grimoirerandom_nextmax">GrimoireRandom_NextMax</h3>
 <div class="highlight"><pre><span></span><code><span class="n">GRIMOIRE_API</span><span class="w"> </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">GrimoireRandom_NextMax</span><span class="p">(</span><span class="n">GrimoireRandom</span><span class="w"> </span><span class="n">random</span><span class="p">,</span><span class="w"> </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">max</span><span class="p">);</span>
 </code></pre></div>
 <p>Equivalent to <code>GrimoireRandom_NextRange(random, 0, max)</code>.</p>
 <ul>
-<li>Intended precondition: <code>max &gt;= 0</code>.</li>
+<li>Precondition: <code>max &gt; 0</code>.</li>
 </ul>
 <h3 id="grimoirerandom_nextdouble">GrimoireRandom_NextDouble</h3>
 <div class="highlight"><pre><span></span><code><span class="n">GRIMOIRE_API</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">GrimoireRandom_NextDouble</span><span class="p">(</span><span class="n">GrimoireRandom</span><span class="w"> </span><span class="n">random</span><span class="p">);</span>
@@ -1282,22 +1306,54 @@
 <li>Keep serialized state buffers version-paired with this release.</li>
 <li>Do not use for cryptographic purposes.</li>
 </ul>
-<h2 id="example-save-and-resume-sequence">Example: Save and Resume Sequence</h2>
-<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;grimoire-pcg/random.h&gt;</span>
+<h2 id="example-checkpoint-and-resume-stream">Example: Checkpoint and Resume Stream</h2>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stddef.h&gt;</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;grimoire-pcg/random.h&gt;</span>
 
 <span class="k">enum</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">GRIMOIRE_RANDOM_STATE_SIZE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">228</span><span class="w"> </span><span class="p">};</span>
 
+<span class="k">typedef</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="nc">RngCheckpoint</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">version</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">uint32_t</span><span class="w"> </span><span class="n">size</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">state</span><span class="p">[</span><span class="n">GRIMOIRE_RANDOM_STATE_SIZE</span><span class="p">];</span>
+<span class="p">}</span><span class="w"> </span><span class="n">RngCheckpoint</span><span class="p">;</span>
+
+<span class="k">static</span><span class="w"> </span><span class="kt">bool</span><span class="w"> </span><span class="nf">checkpoint_save</span><span class="p">(</span><span class="n">GrimoireRandom</span><span class="w"> </span><span class="n">rng</span><span class="p">,</span><span class="w"> </span><span class="n">RngCheckpoint</span><span class="o">*</span><span class="w"> </span><span class="n">outCp</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">rng</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">outCp</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">outCp</span><span class="o">-&gt;</span><span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">    </span><span class="n">outCp</span><span class="o">-&gt;</span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GRIMOIRE_RANDOM_STATE_SIZE</span><span class="p">;</span>
+<span class="w">    </span><span class="n">GrimoireRandom_Serialize</span><span class="p">(</span><span class="n">rng</span><span class="p">,</span><span class="w"> </span><span class="n">outCp</span><span class="o">-&gt;</span><span class="n">state</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">static</span><span class="w"> </span><span class="n">GrimoireRandom</span><span class="w"> </span><span class="nf">checkpoint_load</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">RngCheckpoint</span><span class="o">*</span><span class="w"> </span><span class="n">cp</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">cp</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">cp</span><span class="o">-&gt;</span><span class="n">version</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">cp</span><span class="o">-&gt;</span><span class="n">size</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">GRIMOIRE_RANDOM_STATE_SIZE</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">GrimoireRandom_Deserialize</span><span class="p">(</span><span class="n">cp</span><span class="o">-&gt;</span><span class="n">state</span><span class="p">);</span>
+<span class="p">}</span>
+
 <span class="kt">void</span><span class="w"> </span><span class="nf">sample_resume</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
 <span class="p">{</span>
-<span class="w">    </span><span class="kt">uint8_t</span><span class="w"> </span><span class="n">state</span><span class="p">[</span><span class="n">GRIMOIRE_RANDOM_STATE_SIZE</span><span class="p">];</span>
+<span class="w">    </span><span class="n">RngCheckpoint</span><span class="w"> </span><span class="n">cp</span><span class="p">;</span>
 
 <span class="w">    </span><span class="n">GrimoireRandom</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GrimoireRandom_CreateSeed</span><span class="p">(</span><span class="mi">42</span><span class="p">);</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
 
 <span class="w">    </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">GrimoireRandom_Next</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
-<span class="w">    </span><span class="n">GrimoireRandom_Serialize</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">state</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">checkpoint_save</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">cp</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">GrimoireRandom_Destroy</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
 
-<span class="w">    </span><span class="n">GrimoireRandom</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GrimoireRandom_Deserialize</span><span class="p">(</span><span class="n">state</span><span class="p">);</span>
+<span class="w">    </span><span class="n">GrimoireRandom</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">checkpoint_load</span><span class="p">(</span><span class="o">&amp;</span><span class="n">cp</span><span class="p">);</span>
 <span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">        </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">v1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GrimoireRandom_Next</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
 <span class="w">        </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">v2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GrimoireRandom_Next</span><span class="p">(</span><span class="n">b</span><span class="p">);</span>
@@ -1307,6 +1363,29 @@
 <span class="w">    </span><span class="p">}</span>
 
 <span class="w">    </span><span class="n">GrimoireRandom_Destroy</span><span class="p">(</span><span class="n">a</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="example-branching-a-deterministic-stream">Example: Branching a Deterministic Stream</h2>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;grimoire-pcg/random.h&gt;</span>
+
+<span class="kt">void</span><span class="w"> </span><span class="nf">generate_two_paths</span><span class="p">(</span><span class="n">hash_t</span><span class="w"> </span><span class="n">seed</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">GrimoireRandom</span><span class="w"> </span><span class="n">base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GrimoireRandom_CreateSeed</span><span class="p">(</span><span class="n">seed</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">base</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+
+<span class="w">    </span><span class="n">GrimoireRandom</span><span class="w"> </span><span class="n">branchA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GrimoireRandom_Clone</span><span class="p">(</span><span class="n">base</span><span class="p">);</span>
+<span class="w">    </span><span class="n">GrimoireRandom</span><span class="w"> </span><span class="n">branchB</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GrimoireRandom_Clone</span><span class="p">(</span><span class="n">base</span><span class="p">);</span>
+
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">branchA</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">branchB</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">a0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GrimoireRandom_NextRange</span><span class="p">(</span><span class="n">branchA</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int32_t</span><span class="w"> </span><span class="n">b0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">GrimoireRandom_NextRange</span><span class="p">(</span><span class="n">branchB</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">);</span>
+<span class="w">        </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">a0</span><span class="p">;</span>
+<span class="w">        </span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">b0</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="n">GrimoireRandom_Destroy</span><span class="p">(</span><span class="n">branchB</span><span class="p">);</span>
+<span class="w">    </span><span class="n">GrimoireRandom_Destroy</span><span class="p">(</span><span class="n">branchA</span><span class="p">);</span>
+<span class="w">    </span><span class="n">GrimoireRandom_Destroy</span><span class="p">(</span><span class="n">base</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
 

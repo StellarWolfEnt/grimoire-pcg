@@ -669,6 +669,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#example-animated-cloud-slice-using-3d-noise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Animated Cloud Slice Using 3D Noise
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#implementation-considerations" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -948,6 +959,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#example-animated-cloud-slice-using-3d-noise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: Animated Cloud Slice Using 3D Noise
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#implementation-considerations" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1071,6 +1093,7 @@
 <li><code>lacunarity</code>: around 2.0 as a baseline.</li>
 <li><code>persistence</code>: 0.35 to 0.65 for balanced roughness.</li>
 </ul>
+<p>If <code>staticSeed</code> is false, each octave uses <code>seed + octaveIndex</code>.</p>
 <h2 id="determinism-rules">Determinism Rules</h2>
 <p>Given the same:</p>
 <ul>
@@ -1093,6 +1116,23 @@
 <span class="w">    </span><span class="n">s</span><span class="p">.</span><span class="n">staticSeed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
 
 <span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Grimoire_Fbm</span><span class="p">(</span><span class="n">Grimoire_Perlin2D</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0f</span><span class="p">,</span><span class="w"> </span><span class="mi">1337</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">s</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="example-animated-cloud-slice-using-3d-noise">Example: Animated Cloud Slice Using 3D Noise</h2>
+<div class="highlight"><pre><span></span><code><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;grimoire-pcg/noise.h&gt;</span>
+
+<span class="kt">float</span><span class="w"> </span><span class="nf">cloud_density</span><span class="p">(</span><span class="kt">float</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="kt">float</span><span class="w"> </span><span class="n">timeSeconds</span><span class="p">,</span><span class="w"> </span><span class="n">hash_t</span><span class="w"> </span><span class="n">seed</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="n">GrimoireFractalSettings</span><span class="w"> </span><span class="n">s</span><span class="p">;</span>
+<span class="w">    </span><span class="n">s</span><span class="p">.</span><span class="n">frequency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.015f</span><span class="p">;</span>
+<span class="w">    </span><span class="n">s</span><span class="p">.</span><span class="n">octaves</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span>
+<span class="w">    </span><span class="n">s</span><span class="p">.</span><span class="n">lacunarity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.0f</span><span class="p">;</span>
+<span class="w">    </span><span class="n">s</span><span class="p">.</span><span class="n">persistence</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">;</span>
+<span class="w">    </span><span class="n">s</span><span class="p">.</span><span class="n">staticSeed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+
+<span class="w">    </span><span class="cm">/* Treat time as Z to animate through a stable 3D field. */</span>
+<span class="w">    </span><span class="kt">float</span><span class="w"> </span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">timeSeconds</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">0.08f</span><span class="p">;</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Grimoire_Billow</span><span class="p">(</span><span class="n">Grimoire_Perlin3D</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="p">,</span><span class="w"> </span><span class="n">seed</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">s</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre></div>
 <h2 id="implementation-considerations">Implementation Considerations</h2>
