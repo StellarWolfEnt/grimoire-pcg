@@ -15,7 +15,7 @@ It provides deterministic random generation and noise/fractal APIs with a C-faci
 ## Current Scope
 
 - Platform target: Windows x64.
-- Public headers live in `include/grimoire32`.
+- Public headers live in `include/grimoire-pcg`.
 - Assembly sources live in `win64`.
 - Shared assembler macros live in `inc/common.inc`.
 - Windows resource metadata is defined in `res/dll.rc`.
@@ -30,9 +30,9 @@ It provides deterministic random generation and noise/fractal APIs with a C-faci
 
 ## Public API Headers
 
-- `include/grimoire32/common.h`
-- `include/grimoire32/random.h`
-- `include/grimoire32/noise.h`
+- `include/grimoire-pcg/common.h`
+- `include/grimoire-pcg/random.h`
+- `include/grimoire-pcg/noise.h`
 
 ## Source Layout
 
@@ -40,7 +40,7 @@ It provides deterministic random generation and noise/fractal APIs with a C-faci
 inc/
 	common.inc
 include/
-	grimoire32/
+	grimoire-pcg/
 		common.h
 		noise.h
 		random.h
@@ -55,7 +55,7 @@ win64/
 ## Usage Example
 
 ```c
-#include <grimoire32/random.h>
+#include <grimoire-pcg/random.h>
 
 GrimoireRandom rng = GrimoireRandom_CreateNew();
 if (rng) {
@@ -71,26 +71,6 @@ This repository contains the library sources and headers.
 Build automation used by local development environments may be untracked.
 
 To build, you need a Windows x64 toolchain capable of assembling NASM-style x86-64 and linking a DLL with the Windows SDK resource object.
-
-## Documentation Site
-
-This repository now includes a handcrafted docs site powered by MkDocs (not Doxygen output).
-
-- Config: `mkdocs.yml`
-- Source pages: `docs/`
-
-To run the docs locally:
-
-```powershell
-pip install -r requirements-docs.txt
-mkdocs serve
-```
-
-To build static docs:
-
-```powershell
-mkdocs build
-```
 
 ## Changelog
 
