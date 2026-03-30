@@ -7,17 +7,17 @@ bits 64
 ;-------------------------------------------------------------------------------
 
 section .pdata rdata align=4
-    __GrimoireDllMain_pdata:
-        dd GrimoireDllMain - $$
-        dd GrimoireDllMain_End - $$
-        dd __GrimoireDllMain_xdata - $$
+    __GrimoireDll_Main_pdata:
+        dd GrimoireDll_Main - $$
+        dd GrimoireDll_Main_End - $$
+        dd __GrimoireDll_Main_xdata - $$
 
 ;-------------------------------------------------------------------------------
 ; XData
 ;-------------------------------------------------------------------------------
 
 section .xdata rdata align=4
-    __GrimoireDllMain_xdata:
+    __GrimoireDll_Main_xdata:
         db 1,
         db 0,
         db 0,
@@ -29,11 +29,11 @@ section .xdata rdata align=4
 
 section .text code align=16
 
-; START: GrimoireDllMain -------------------------------------------------------
+; START: GrimoireDll_Main -------------------------------------------------------
 
-GRIMOIRE_INTERNAL GrimoireDllMain
+GRIMOIRE_INTERNAL GrimoireDll_Main
     mov         rax, 1
     ret
-MARKER GrimoireDllMain_End
+MARKER GrimoireDll_Main_End
 
-; END: GrimoireDllMain ---------------------------------------------------------
+; END: GrimoireDll_Main ---------------------------------------------------------

@@ -3,7 +3,7 @@
  * @brief Noise generation functions and fractal settings.
  *
  * Provides 1D, 2D, and 3D value and Perlin noise functions, plus fractal and billow noise
- * combiners. Uses a deterministic seed for reproducible patterns. Implementations are in `noise.c`.
+ * combiners. Uses a deterministic seed for reproducible patterns
  *
  * @author Stellar Wolf
  * @version 1.0.0
@@ -18,17 +18,18 @@ GRIMOIRE_BEGIN
 
 /**
  * @struct GrimoireFractalSettings
- * @brief Parameters for fractal noise generation.
+ * @brief Parameters controlling fractal noise generation.
  *
- * Defines how multiple octaves of a base noise function are combined to create fractal noise patterns.
+ * Defines how multiple octaves of a base noise function are combined to produce
+ * fractal patterns such as fBm or billow noise.
  */
 typedef struct GrimoireFractalSettings
 {
-    float frequency;   //< Base frequency of the noise.
-    uint32_t octaves;  //< Number of noise layers to combine.
-    float lacunarity;  //< Frequency multiplier for each octave.
-    float persistence; //< Amplitude multiplier for each octave.
-    bool staticSeed;   //< Use static seed per octave if true.
+    float frequency;   //< Starting frequency of the first layer.
+    uint32_t octaves;  //< Number of layers to generate and combine.
+    float lacunarity;  //< How much the frequency increases per layer.
+    float persistence; //< How much the amplitude decreases per layer.
+    bool staticSeed;   //< If true, every layer uses the same seed; if false, each layer uses seed + layerIndex.
 } GrimoireFractalSettings;
 
 /**
@@ -45,7 +46,7 @@ typedef struct GrimoireFractalSettings
  */
 typedef float (*GrimoireNoiseFunction)(float x, float y, float z, hash_t seed);
 
-/* ---------------- Value Noise (Sharp) ---------------- */
+/* Value Noise (Sharp) ---------------------------------------------------------------------------------------------- */
 
 /**
  * @brief Computes 1D sharp value noise.
@@ -89,7 +90,7 @@ GRIMOIRE_API float Grimoire_ValueSharp2D(float x, float y, float z, hash_t seed)
  */
 GRIMOIRE_API float Grimoire_ValueSharp3D(float x, float y, float z, hash_t seed);
 
-/* ---------------- Value Noise (Smooth) ---------------- */
+/* Value Noise (Smooth) --------------------------------------------------------------------------------------------- */
 
 /**
  * @brief Computes 1D smooth value noise.
@@ -133,7 +134,7 @@ GRIMOIRE_API float Grimoire_ValueSmooth2D(float x, float y, float z, hash_t seed
  */
 GRIMOIRE_API float Grimoire_ValueSmooth3D(float x, float y, float z, hash_t seed);
 
-/* ---------------- Perlin Noise ---------------- */
+/* Perlin Noise ----------------------------------------------------------------------------------------------------- */
 
 /**
  * @brief Computes 1D Perlin noise.
@@ -177,7 +178,7 @@ GRIMOIRE_API float Grimoire_Perlin2D(float x, float y, float z, hash_t seed);
  */
 GRIMOIRE_API float Grimoire_Perlin3D(float x, float y, float z, hash_t seed);
 
-/* ---------------- Fractal / Billow Noise ---------------- */
+/* Fractal Noise ---------------------------------------------------------------------------------------------------- */
 
 /**
  * @brief Computes fractal noise from multiple octaves of a base noise function.
@@ -191,7 +192,7 @@ GRIMOIRE_API float Grimoire_Perlin3D(float x, float y, float z, hash_t seed);
  * @param z Z-coordinate for evaluation.
  * @param seed Deterministic seed for reproducible noise.
  * @param settings Pointer to fractal noise parameters.
- * @return Fractal noise value in [0.0, 1.0].
+ * @return Fractal noise value in the same output range as the base noise function, typically [0.0, 1.0].
  */
 GRIMOIRE_API float Grimoire_Fbm(GrimoireNoiseFunction noiseFunc, float x, float y, float z, hash_t seed,
                                 const GrimoireFractalSettings* settings);
@@ -208,7 +209,7 @@ GRIMOIRE_API float Grimoire_Fbm(GrimoireNoiseFunction noiseFunc, float x, float 
  * @param z Z-coordinate for evaluation.
  * @param seed Deterministic seed for reproducible noise.
  * @param settings Pointer to billow noise parameters.
- * @return Billow noise value in [0.0, 1.0].
+ * @return Billow noise value in the same output range as the base noise function, typically [0.0, 1.0].
  */
 GRIMOIRE_API float Grimoire_Billow(GrimoireNoiseFunction noiseFunc, float x, float y, float z, hash_t seed,
                                    const GrimoireFractalSettings* settings);

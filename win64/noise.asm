@@ -6,17 +6,17 @@ bits 64
 ; Structure Definitions
 ;-------------------------------------------------------------------------------
 
-; START: Grimoire_FbmSettings -----------------------------------------------
+; START: Grimoire_FractalSettings -----------------------------------------------
 
-%define Grimoire_FbmSettings_Frequency 0
-%define Grimoire_FbmSettings_Octaves (Grimoire_FbmSettings_Frequency + 4)
-%define Grimoire_FbmSettings_Lacunarity (Grimoire_FbmSettings_Octaves + 4)
-%define Grimoire_FbmSettings_Persistence (Grimoire_FbmSettings_Lacunarity + 4)
-%define Grimoire_FbmSettings_StaticSeed (Grimoire_FbmSettings_Persistence + 4)
-%define Grimoire_FbmSettings_Padding (Grimoire_FbmSettings_StaticSeed + 1)
-%define Grimoire_FbmSettings_Size (Grimoire_FbmSettings_Padding + 15)
+%define Grimoire_FractalSettings_Frequency 0
+%define Grimoire_FractalSettings_Octaves (Grimoire_FractalSettings_Frequency + 4)
+%define Grimoire_FractalSettings_Lacunarity (Grimoire_FractalSettings_Octaves + 4)
+%define Grimoire_FractalSettings_Persistence (Grimoire_FractalSettings_Lacunarity + 4)
+%define Grimoire_FractalSettings_StaticSeed (Grimoire_FractalSettings_Persistence + 4)
+%define Grimoire_FractalSettings_Padding (Grimoire_FractalSettings_StaticSeed + 1)
+%define Grimoire_FractalSettings_Size (Grimoire_FractalSettings_Padding + 15)
 
-; END: Grimoire_FbmSettings -------------------------------------------------
+; END: Grimoire_FractalSettings -------------------------------------------------
 
 ;-------------------------------------------------------------------------------
 ; Constants
@@ -1067,9 +1067,9 @@ GRIMOIRE_PUBLIC Grimoire_Fbm
     mov r11d, edx
 
     mov rbx, rcx
-    mov rsi, [r10 + Grimoire_FbmSettings_Octaves]
+    mov rsi, [r10 + Grimoire_FractalSettings_Octaves]
 
-    movups xmm3, [r10 + Grimoire_FbmSettings_Frequency]
+    movups xmm3, [r10 + Grimoire_FractalSettings_Frequency]
     mulps xmm0, xmm3
     mulps xmm1, xmm3
     mulps xmm2, xmm3
@@ -1086,7 +1086,7 @@ GRIMOIRE_PUBLIC Grimoire_Fbm
     movaps xmm0, xmm9
     movaps xmm1, xmm10
     movaps xmm2, xmm11
-    movups xmm3, [r10 + Grimoire_FbmSettings_Lacunarity]
+    movups xmm3, [r10 + Grimoire_FractalSettings_Lacunarity]
     mulps xmm9, xmm3
     mulps xmm10, xmm3
     mulps xmm11, xmm3
@@ -1094,9 +1094,9 @@ GRIMOIRE_PUBLIC Grimoire_Fbm
     mulps xmm0, xmm7
     addps xmm6, xmm0
     addps xmm8, xmm7
-    movups xmm3, [r10 + Grimoire_FbmSettings_Persistence]
+    movups xmm3, [r10 + Grimoire_FractalSettings_Persistence]
     mulps xmm7, xmm3
-    mov al, byte [r10 + Grimoire_FbmSettings_StaticSeed]
+    mov al, byte [r10 + Grimoire_FractalSettings_StaticSeed]
     not al
     and al, 1
     add r11d, eax
@@ -1138,9 +1138,9 @@ GRIMOIRE_PUBLIC Grimoire_Billow
     mov r11d, edx
 
     mov rbx, rcx
-    mov rsi, [r10 + Grimoire_FbmSettings_Octaves]
+    mov rsi, [r10 + Grimoire_FractalSettings_Octaves]
 
-    movups xmm3, [r10 + Grimoire_FbmSettings_Frequency]
+    movups xmm3, [r10 + Grimoire_FractalSettings_Frequency]
     mulps xmm0, xmm3
     mulps xmm1, xmm3
     mulps xmm2, xmm3
@@ -1157,7 +1157,7 @@ GRIMOIRE_PUBLIC Grimoire_Billow
     movaps xmm0, xmm9
     movaps xmm1, xmm10
     movaps xmm2, xmm11
-    movups xmm3, [r10 + Grimoire_FbmSettings_Lacunarity]
+    movups xmm3, [r10 + Grimoire_FractalSettings_Lacunarity]
     mulps xmm9, xmm3
     mulps xmm10, xmm3
     mulps xmm11, xmm3
@@ -1168,9 +1168,9 @@ GRIMOIRE_PUBLIC Grimoire_Billow
     mulps xmm0, xmm7
     addps xmm6, xmm0
     addps xmm8, xmm7
-    movups xmm3, [r10 + Grimoire_FbmSettings_Persistence]
+    movups xmm3, [r10 + Grimoire_FractalSettings_Persistence]
     mulps xmm7, xmm3
-    mov al, byte [r10 + Grimoire_FbmSettings_StaticSeed]
+    mov al, byte [r10 + Grimoire_FractalSettings_StaticSeed]
     not al
     and al, 1
     add r11d, eax
