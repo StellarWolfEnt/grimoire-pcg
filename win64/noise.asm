@@ -1050,7 +1050,7 @@ MARKER Grimoire_Perlin3D_End
 
 ; END: Grimoire_Perlin3D -------------------------------------------------------
 
-; START: Grimoire_Fbm ------------------------------------------------------
+; START: Grimoire_Fbm ----------------------------------------------------------
 
 GRIMOIRE_PUBLIC Grimoire_Fbm
     sub rsp, 136
@@ -1119,7 +1119,7 @@ GRIMOIRE_PUBLIC Grimoire_Fbm
     ret
 MARKER Grimoire_Fbm_End
 
-; END: Grimoire_Fbm --------------------------------------------------------
+; END: Grimoire_Fbm ------------------------------------------------------------
 
 ; START: Grimoire_Billow -------------------------------------------------------
 

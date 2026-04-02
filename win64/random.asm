@@ -472,6 +472,7 @@ GRIMOIRE_PUBLIC GrimoireRandom_Serialize
     mov         rax, qword [rcx]
     sub         rax, r8
     shr         rax, 2
+    inc         rax
     mov         r10d, eax
     bswap       r10d
     cmp         byte [rel endian_test], 0x00
@@ -497,7 +498,7 @@ GRIMOIRE_PUBLIC GrimoireRandom_Deserialize
     call        calloc
 
     test        rax, rax
-    jz          .GrimoireRandom_Deserialize_Done ; branch 2
+    jz          .GrimoireRandom_Deserialize_Done
 
     mov         rcx, [rsp + 48]
     mov         [rsp + 48], rax
@@ -526,8 +527,7 @@ GRIMOIRE_PUBLIC GrimoireRandom_Deserialize
     sub         r8, 4
     shl         rdx, 2
     add         rdx, r9
-    cmp         r10d, -1
-    cmove       rdx, r8
+    sub         rdx, 4
     mov         qword [rax], rdx
     add         rcx, 4
     add         rax, 8
